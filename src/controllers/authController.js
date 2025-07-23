@@ -1,5 +1,5 @@
 const User = require("../models/User");
-const EscalationTeam = require("../models/EscalationTeam");
+const EscalationTeam = require("../models/escalationTeam");
 const Authorization = require("../common/utils/generateJWT");
 const EmailService = require("./emailServiceController");
 const bcrypt = require("bcryptjs");

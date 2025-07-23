@@ -1,4 +1,4 @@
-const EscalationTeam = require("../models/EscalationTeam");
+const EscalationTeam = require("../models/escalationTeam");
 
 class EscalationTeamController {
   // Create a new escalation team

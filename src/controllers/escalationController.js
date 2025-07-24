@@ -1,6 +1,6 @@
 const Ticket = require('../models/Ticket');
 const EscalationThreshold = require('../models/EscalationThreshold');
-const EscalationTeam = require('../models/EscalationTeam');
+const EscalationTeam = require("../models/escalationTeam");
 
 class EscalationController {
     constructor() {

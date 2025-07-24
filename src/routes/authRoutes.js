@@ -6,8 +6,12 @@ const UserValidator = require("../validators/userValidator");
 const router = express.Router();
 
 // Public routes
-router.post("/register", UserValidator.validateLogin, AuthController.register);
-router.post("/login", UserValidator.validateRegister, AuthController.login);
+router.post(
+  "/register",
+  UserValidator.validateRegister,
+  AuthController.register
+);
+router.post("/login", UserValidator.validateLogin, AuthController.login);
 router.post("/refresh-token", AuthController.refreshToken);
 router.post(
   "/request-password-reset",

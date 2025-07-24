@@ -8,7 +8,7 @@ const router = express.Router();
 router.post(
   "/",
   authenticate,
-  TicketValidator.validateCreateTicket,
+
   TicketController.createTicket
 );
 router.get("/", authenticate, TicketController.getTickets);

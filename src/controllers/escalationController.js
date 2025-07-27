@@ -187,7 +187,7 @@ class EscalationController {
             ticket.escalation.isEscalated = true;
             ticket.escalation.escalatedAt = Date.now();
             ticket.escalation.reason = reason;
-            ticket.escalation.level = level + 1;
+            ticket.escalation.level = level;
             ticket.escalation.escalatedBy = req.user._id;
             ticket.escalation.escalationTeam=escalationTeam._id
             ticket.escalation.lastEscalationAttempt = Date.now();

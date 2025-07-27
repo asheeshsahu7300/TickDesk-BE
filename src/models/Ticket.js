@@ -24,7 +24,7 @@ const escalationSchema = new Schema({
   level: { type: Number },
   escalatedBy: {
     type: mongoose.Schema.Types.Mixed,
-    required: false,
+    required: true,
     validate: {
       validator: function (value) {
         // Allow either an ObjectId or the string 'system'

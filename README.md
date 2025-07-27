@@ -140,7 +140,6 @@ Ticket creation alerts
 Ticket status updates for users and agents
 
 🧪 Future Improvements
-
 AI Feedback loop for improved suggestions
 File upload to S3 / Cloudinary
 Audit logs

@@ -6,7 +6,7 @@ const { authenticate, authorize } = require("../middleware/authMiddleware");
 
 // Create a new escalation team
 router.post(
-  "/teams",
+  "/create-team",
   authenticate,
   RoleMiddleware.requireAdmin(["admin"]),
   EscalationTeamController.createTeam

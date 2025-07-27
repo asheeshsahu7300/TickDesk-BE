@@ -34,6 +34,7 @@ class AuthController {
         return res.status(409).json({ error: "Email already registered" });
       }
 
+      let team = null;
       if (role === "agent" && !team_id) {
         return res
           .status(400)
@@ -41,7 +42,7 @@ class AuthController {
       }
 
       if (team_id) {
-        const team = await EscalationTeam.findById(team_id);
+        team = await EscalationTeam.findById(team_id);
         if (!team) {
           return res.status(404).json({ error: "Team not found" });
         }
@@ -57,6 +58,12 @@ class AuthController {
         role,
         team_id,
       });
+
+      // ✅ Add user to team's members if role is agent
+      if (team && role === "agent") {
+        team.members.push(user._id);
+        await team.save();
+      }
 
       const token = await Authorization.generateJwtToken(user);
       const refreshToken = this._generateRefreshToken();
@@ -75,6 +82,7 @@ class AuthController {
           sameSite: "Strict",
           maxAge: 7 * 24 * 60 * 60 * 1000,
         });
+
         await User.findByIdAndUpdate(user._id, {
           refreshToken,
           lastLogin: new Date(),

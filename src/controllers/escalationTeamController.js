@@ -131,7 +131,7 @@ class EscalationTeamController {
   // Delete team
   async deleteTeam(req, res) {
     try {
-      const team = await EscalationTeam.findById(req.params.id);
+      const team = await EscalationTeam.findById(req.params.id, "_id");
 
       if (!team) {
         return res.status(404).json({
@@ -140,7 +140,7 @@ class EscalationTeamController {
         });
       }
 
-      await team.remove();
+      await team.deleteOne();
 
       return res.status(200).json({
         success: true,

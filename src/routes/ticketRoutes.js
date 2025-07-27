@@ -6,7 +6,7 @@ const TicketValidator = require("../validators/ticketValidator");
 
 const router = express.Router();
 router.post(
-  "/",
+  "/create-ticket",
   authenticate,
 
   TicketController.createTicket

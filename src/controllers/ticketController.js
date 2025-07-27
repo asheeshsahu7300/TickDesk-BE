@@ -54,12 +54,12 @@ class TicketController {
       if (assignment?.teamId) {
         escalation.escalationTeam = assignment.teamId;
         escalation.level = 1;
+        escalation.escalatedBy = req.user._id;
 
         // Pick random agent from the team
         const teamAgents = await User.find({
           team_id: assignment.teamId,
           role: "agent",
-          escalation_level: 1,
         });
 
         if (teamAgents.length > 0) {

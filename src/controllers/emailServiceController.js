@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+const Category = require("../models/Category");
 
 class EmailService {
   constructor() {
@@ -60,6 +61,204 @@ class EmailService {
       console.error("Error sending reset email:", error.message);
       throw new Error("Failed to send reset email");
     }
+  }
+
+  async sendTicketUpdateToUser(email, ticketDetails) {
+    try {
+      const {
+        _id: ticketId,
+        status,
+        updatedBy = "System",
+        description,
+        escalation,
+        priority,
+        category,
+        subcategory,
+      } = ticketDetails;
+
+      const escalationNotice = escalation?.isEscalated
+        ? `
+      <p style="color: #c0392b;"><strong>Escalation Notice:</strong></p>
+      <ul>
+        <li><strong>Level:</strong> ${escalation.level}</li>
+        <li><strong>Team:</strong> ${
+          escalation.escalationTeam?.name || "N/A"
+        }</li>
+        <li><strong>Escalated At:</strong> ${new Date(
+          escalation.escalatedAt
+        ).toLocaleString()}</li>
+      </ul>
+      `
+        : "";
+
+      const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+        <h2 style="color: #007bff;">Ticket #${ticketId} Update</h2>
+        <p><strong>Status:</strong> ${status}</p>
+        <p><strong>Updated By:</strong> ${updatedBy}</p>
+        <p><strong>Priority:</strong> ${priority || "N/A"}</p>
+        <p><strong>Category:</strong> ${category?.name || "N/A"}</p>
+        <p><strong>Subcategory:</strong> ${
+          (Array.isArray(category?.subcategories)
+            ? category.subcategories.find((s) => s._id === subcategory)?.name
+            : null) || "N/A"
+        }</p>
+        <p><strong>Description:</strong> ${
+          description || "No description provided"
+        }</p>
+        ${escalationNotice}
+        <hr>
+        <p style="font-size: 12px; color: #999;">Please do not reply to this email. This is an automated message.</p>
+      </div>
+    `;
+
+      const mailOptions = {
+        from: `"${process.env.APP_NAME || "Support"}" <${
+          process.env.SMTP_FROM
+        }>`,
+        to: email,
+        subject: `Ticket #${ticketId} - Status Update`,
+        html,
+      };
+
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log("Ticket update email sent to user:", info.messageId);
+      return { success: true, messageId: info.messageId };
+    } catch (error) {
+      console.error("Error sending ticket update email:", error.message);
+      throw new Error("Failed to send ticket update email");
+    }
+  }
+
+  async sendTicketCreationToUser(email, ticketDetails) {
+    try {
+      const {
+        _id: ticketId,
+        status,
+        createdBy = "System",
+        description,
+        escalation,
+        priority,
+        category,
+        subcategory,
+        createdAt,
+      } = ticketDetails;
+
+      const categoryDetails = await Category.findById(category);
+
+      console.log(subcategory);
+
+      const escalationNotice = escalation?.isEscalated
+        ? `
+      <p style="color: #c0392b;"><strong>Escalation Notice:</strong></p>
+      <ul>
+        <li><strong>Level:</strong> ${escalation.level}</li>
+        <li><strong>Team:</strong> ${
+          escalation.escalationTeam?.name || "N/A"
+        }</li>
+        <li><strong>Escalated At:</strong> ${new Date(
+          escalation.escalatedAt
+        ).toLocaleString()}</li>
+      </ul>
+      `
+        : "";
+
+      const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+        <h2 style="color: #28a745;">New Ticket Created: #${ticketId}</h2>
+        <p><strong>Status:</strong> ${status}</p>
+        <p><strong>Created By:</strong> ${createdBy}</p>
+        <p><strong>Created At:</strong> ${new Date(
+          createdAt || Date.now()
+        ).toLocaleString()}</p>
+        <p><strong>Priority:</strong> ${priority}</p>
+        <p><strong>Category:</strong> ${categoryDetails?.name}</p>
+        <p><strong>Subcategory:</strong> ${
+          Array.isArray(categoryDetails?.subcategories)
+            ? categoryDetails.subcategories.find((s) => s._id == subcategory)
+                ?.name
+            : null
+        }</p>
+        <p><strong>Description:</strong> ${
+          description || "No description provided"
+        }</p>
+        ${escalationNotice}
+        <hr>
+        <p style="font-size: 12px; color: #999;">This is a system-generated email. Please do not reply.</p>
+      </div>
+    `;
+
+      const mailOptions = {
+        from: `"${process.env.APP_NAME || "Support"}" <${
+          process.env.SMTP_FROM
+        }>`,
+        to: email,
+        subject: `New Ticket Created: #${ticketId}`,
+        html,
+      };
+
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log("Ticket creation email sent to user:", info.messageId);
+      return { success: true, messageId: info.messageId };
+    } catch (error) {
+      console.error("Error sending ticket creation email:", error.message);
+      throw new Error("Failed to send ticket creation email");
+    }
+  }
+
+  async sendNewTicketToAgent(email, ticketDetails) {
+    try {
+      const { ticketId, category, priority, userName } = ticketDetails;
+
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px;">
+          <h2>New Ticket Assigned</h2>
+          <p><strong>Ticket ID:</strong> ${ticketId}</p>
+          <p><strong>Category:</strong> ${category}</p>
+          <p><strong>Priority:</strong> ${priority}</p>
+          <p><strong>Requested By:</strong> ${userName}</p>
+        </div>`;
+
+      const mailOptions = {
+        from: `"${process.env.APP_NAME || "Support"}" <${
+          process.env.SMTP_FROM
+        }>`,
+        to: email,
+        subject: `New Ticket Assigned: #${ticketId}`,
+        html,
+      };
+
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log("New ticket email sent to agent:", info.messageId);
+      return { success: true, messageId: info.messageId };
+    } catch (error) {
+      console.error("Error sending new ticket email:", error.message);
+      throw new Error("Failed to send new ticket email");
+    }
+  }
+
+  async sendEscalationUserEmail(userEmail, ticket) {
+    const html = `
+      <div>
+        <h3>Your ticket has been escalated</h3>
+        <p><strong>Ticket ID:</strong> ${ticket._id}</p>
+        <p><strong>Subject:</strong> ${ticket.subject}</p>
+        <p>Your issue has been escalated to a higher support level for faster resolution.</p>
+      </div>
+    `;
+    return this.sendEmail(userEmail, "Ticket Escalated", html);
+  }
+
+  async sendEscalationAgentEmail(agentEmail, ticket) {
+    const html = `
+      <div>
+        <h3>New Escalated Ticket Assigned</h3>
+        <p><strong>Ticket ID:</strong> ${ticket._id}</p>
+        <p><strong>Subject:</strong> ${ticket.subject}</p>
+        <p>This ticket has been escalated and assigned to you for resolution.</p>
+      </div>
+    `;
+    return this.sendEmail(agentEmail, "New Escalated Ticket Assigned", html);
   }
 }
 

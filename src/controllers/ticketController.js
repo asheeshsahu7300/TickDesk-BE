@@ -5,6 +5,7 @@ const Category = require("../models/Category");
 const ticketConversation = require("../models/ticketConversation");
 const { autoAssignTicket } = require("../services/autoAssignService");
 const { suggestCategoryAI } = require("../services/aiAutoCategoryService");
+const EmailService = require("./emailServiceController");
 
 class TicketController {
   constructor() {
@@ -93,6 +94,8 @@ class TicketController {
 
       ticket.conversations.push(conversation);
       await ticket.save();
+
+      await EmailService.sendTicketCreationToUser(req.user.email, ticket);
 
       // Send full populated ticket
       res.status(201).json(await this._populateTicket(ticket));
@@ -244,6 +247,7 @@ class TicketController {
       }
 
       await ticket.save();
+      await EmailService.sendTicketUpdateToUser(req.user.email, ticket);
       res.json(await this._populateTicket(ticket));
     } catch (error) {
       this._handleError(res, error);

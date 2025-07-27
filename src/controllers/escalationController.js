@@ -166,22 +166,28 @@ class EscalationController {
     // Manually escalate a specific ticket
     async manualEscalate(req, res) {
         try {
-            const { ticketId, reason,level } = req.body;
+            const { ticket_id, reason, level } = req.body;
 
-            const ticket = await Ticket.findById(ticketId).populate('assignee', 'name email');
+            const ticket = await Ticket.findById(ticket_id).populate(
+              "assignee",
+              "name email"
+            );
+            console.log(ticket);
             if (!ticket) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Ticket not found'
-                });
+              return res.status(404).json({
+                success: false,
+                message: "Ticket not found",
+              });
             }
-            const escalationTeam = await EscalationTeam.findOne({ 'escalation_levels.level': level });
+            const escalationTeam = await EscalationTeam.findOne({
+              "escalation_levels.level": level,
+            });
 
-console.log( typeof(ticket.escalation))
+            console.log(typeof ticket.escalation);
             ticket.escalation.isEscalated = true;
             ticket.escalation.escalatedAt = Date.now();
             ticket.escalation.reason = reason;
-            ticket.escalation.level = level
+            ticket.escalation.level = level + 1;
             ticket.escalation.escalatedBy = req.user._id;
             ticket.escalation.escalationTeam=escalationTeam._id
             ticket.escalation.lastEscalationAttempt = Date.now();

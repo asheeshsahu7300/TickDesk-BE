@@ -8,7 +8,6 @@ router.post("/auto-escalate", authenticate, EscalationController.autoEscalate);
 router.post(
   "/manual-escalate",
   authenticate,
-  EscalationValidator.validateManualEscalation,
   EscalationController.manualEscalate
 );
 router.post(

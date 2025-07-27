@@ -1,6 +1,6 @@
-# 📋 Ticket Desk – Backend
+# 📋 TickDesk – Backend
 
-**Ticket Desk** is a robust backend ticketing and escalation system designed to manage user support tickets, automatic/manual escalations, team assignments, and resolution tracking. It offers role-based authentication (admin, agent, user) and integrates AI-assisted categorization and team assignment.
+**TickDesk** is a robust backend ticketing and escalation system designed to manage user support tickets, automatic/manual escalations, team assignments, and resolution tracking. It offers role-based authentication (admin, agent, user) and integrates AI-assisted categorization and team assignment.
 
 ---
 
